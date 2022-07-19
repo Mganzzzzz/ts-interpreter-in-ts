@@ -1,0 +1,5 @@
+/packages*
+/uploads*
+/logs*
+.git
+.idea

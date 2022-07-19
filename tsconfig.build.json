@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": false, //sourceMap
+    "inlineSourceMap":true//生成目标文件的inline SourceMap，inline SourceMap会包含在生成的js
+  },
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+}

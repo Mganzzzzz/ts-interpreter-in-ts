@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  nest-app:
+    image: node:14.18
+    container_name: static_admin_be
+    working_dir: /code
+    command: bash -c "npm run build  && npm run start:prod"
+    ports:
+      - "8081:9999"
+    privileged: true
+    volumes:
+      - .:/code
+    restart: always
+    environment:
+      NODE_ENV: production
+

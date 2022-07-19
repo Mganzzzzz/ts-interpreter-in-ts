@@ -4,54 +4,16 @@ let source = [
     '}',
     'sayHello', '(', ')',
 ]
-
-enum TokenType {
-    TypeString,
-    TypeQuotation,
-}
-
-class Token {
-    constructor(raw, type: TokenType) {
-    }
-}
-
 let position = 0
-
-class Statement {
-    token: Token
-
-    constructor(token?: Token) {
-        this.token = token
-    }
-}
-
-
-class FunctionDecl extends Statement {
-    funcName: string
-
-    constructor(statement: Statement[]) {
-        super();
-
-    }
-}
-
-class FunctionBody extends Statement {
-    funcName: string
-
-    constructor(statement: Statement[]) {
-        super();
-
-    }
-}
 
 /**
  * Date:
  * Time:
  *  functionDecl: "function" identifier "(" ")" functionBody
  */
-function parseFuncDecl(): FunctionDecl | null {
+function parseFuncDecl() {
     let funcName
-    let ret: Statement[] = []
+    let ret = []
     while (true) {
         let token = source[position]
         if (token === 'function') {
@@ -79,7 +41,7 @@ function parseFuncDecl(): FunctionDecl | null {
             return null
         }
     }
-    return new FunctionDecl(ret)
+    return ret
 }
 
 /**
@@ -87,7 +49,7 @@ function parseFuncDecl(): FunctionDecl | null {
  * Time:
  *  functionBody: "{" functionCall "}"
  */
-function parseFuncBody(): FunctionBody | null {
+function parseFuncBody() {
     let ret = []
     while (true) {
         let token = source[position]
@@ -102,7 +64,7 @@ function parseFuncBody(): FunctionBody | null {
             break
         }
     }
-    return new FunctionBody(ret)
+    return ret
 }
 
 /**
@@ -119,7 +81,7 @@ function parseFuncCall() {
     if (source[position] === '(') {
         position++
         while (source[position] !== ')') {
-            let token = source[position]
+            token = source[position]
             if (token === '"' || token === "'") {
             } else if (token === ',') {
             } else {

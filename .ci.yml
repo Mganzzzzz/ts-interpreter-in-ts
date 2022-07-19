@@ -1,0 +1,58 @@
+kind: pipeline
+name: build-dev
+type: docker
+
+workspace:
+  path: /code
+
+steps:
+  - name: deploy-dev-scp
+    image: appleboy/drone-scp
+    volumes:
+      - name: output
+        path: /tmp/output
+    settings:
+      host:
+        from_secret: dev_host
+      username:
+        from_secret: dev_user
+      key:
+        from_secret: ssh_key
+      port: 22
+      source: /code
+      target: /home/dev/drone/deploy/${DRONE_REPO_NAME}/
+
+  - name: deploy-dev-ssh
+    image: appleboy/drone-ssh
+    settings:
+      host:
+        from_secret: dev_host
+      username:
+        from_secret: dev_user
+      key:
+        from_secret: ssh_key
+      port: 22
+      script:
+        - cd /home/dev/drone/deploy/${DRONE_REPO_NAME}/code
+        - make run-prod
+        -
+trigger:
+  branch:
+    - master
+  event:
+    - push
+
+volumes:
+  - name: npm_cache
+    host:
+      path: /tmp/npm_cache
+  - name: output
+    host:
+      path: /tmp/output
+  - name: www
+    host:
+      path: /home/dev/www
+  - name: node_modules
+    host:
+      path: /tmp/node_modules
+
