@@ -1,10 +1,14 @@
 import {Statement} from "./statment";
+import {FunctionBody} from "./function-body";
+import {Token} from "../tokenizer";
 
 export class FunctionDecl extends Statement {
-    funcName: string
+    funcName: Token
+    funcBody: FunctionBody
 
-    constructor(statement: Statement[]) {
+    constructor(statement: FunctionBody, funcName: Token) {
         super();
-
+        this.funcBody = statement
+        this.funcName = funcName
     }
 }

@@ -1,11 +1,10 @@
 import {Statement} from "./statment";
 
-export class FunctionBody extends Statement {
+export class Program extends Statement {
     statement: Statement[]
 
     constructor(statement: Statement[]) {
         super();
         this.statement = statement
-
     }
 }

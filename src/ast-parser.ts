@@ -1,13 +1,14 @@
-import {AST} from "eslint";
-import Token = AST.Token;
 import {Statement} from "./ast-obj/statment";
 import {FunctionDecl} from "./ast-obj/function-decl";
+import {Token, TokenType} from "./tokenizer";
 import {FunctionBody} from "./ast-obj/function-body";
 import {FunctionCall} from "./ast-obj/function-call";
+import {FunctionParameter} from "./ast-obj/function-parameter";
+import {Program} from "./ast-obj/program";
 
 export class AstParser {
     tokenList: Token[]
-    index: number
+    index: number = 0
 
     constructor(tokenList: Token[]) {
         this.tokenList = tokenList
@@ -19,8 +20,8 @@ export class AstParser {
         }
     }
 
-    get token() {
-        return this.token[this.index]
+    get token(): Token | null {
+        return this.tokenList[this.index]
     }
 
     /**
@@ -29,37 +30,23 @@ export class AstParser {
      *  functionDecl: "function" identifier "(" ")" functionBody
      */
     parseFuncDecl(): FunctionDecl | null {
-        let ret: Statement[] = []
-        let funcName
-        while (true) {
-            let token = this.token
-            if (token === 'function') {
-                this.next()
+        let funcBody: FunctionBody
+        let token = this.token
+        let funcName: Token
 
-                funcName = this.token
-                ret.push(funcName)
-                this.next()
-                continue
-            } else if (token === '(') {
-                console.log('debug token', token)
-                this.next()
-                this.next()
-                continue
-            } else if (token === '{') {
-                console.log('debug token', token)
-                let body = this.parseFuncBody()
-                if (body) {
-                    ret.push(body)
-                }
-                continue
-            } else if (token === '}') {
-                this.next()
-                break
-            } else {
-                return null
-            }
+        if (!token) {
+            return null
         }
-        return new FunctionDecl(ret)
+
+        if (token.type === TokenType.TypeString && token.raw === 'function') {
+            this.next()
+            funcName = this.token
+            this.next()
+            funcBody = this.parseFuncBody()
+        } else {
+            return null
+        }
+        return new FunctionDecl(funcBody, funcName)
     }
 
     /**
@@ -68,21 +55,13 @@ export class AstParser {
      *  functionBody: "{" functionCall "}"
      */
     parseFuncBody(): FunctionBody | null {
-        let ret = []
-        while (true) {
-            let token = this.token
-            if (token === '{') {
-                this.next()
-                let body = this.parseFuncCall()
-                if (body) {
-                    ret.push(body)
-                }
-            } else if (token === '}') {
-                // position--
-                break
-            }
+        const sm: Statement[] = []
+        while (this.token.type !== TokenType.RightBrace) {
+            sm.push(new Statement(this.token))
+            this.next()
         }
-        return new FunctionBody(ret)
+        this.next()
+        return new FunctionBody(sm)
     }
 
     /**
@@ -92,29 +71,43 @@ export class AstParser {
      * params: string  ","
      */
     parseFuncCall(): FunctionCall {
-        let ret = []
-        let funcName = this.token
-        ret.push(funcName)
-        this.next()
-        if (this.token === '(') {
-            this.next()
-            while (this.token !== ')') {
-                let token = this.token
-                if (token === '"' || token === "'") {
-                } else if (token === ',') {
-                } else {
-                    ret.push(token)
-                }
-                this.next()
-            }
-            this.next()
-        } else {
+        if (this.token.type !== TokenType.TypeString) {
             return null
         }
-        return new FunctionCall(ret)
+        let funcName = this.token
+        let params: FunctionParameter | null
+        this.next()
+        const t = this.token
+        if (t.type === TokenType.LeftParenthesis) {
+            params = this.parseFuncParams()
+        } else {
+            throw new Error('function should call with ()')
+        }
+        return new FunctionCall(funcName, params)
     }
 
-    parseProg(source) {
+    parseFuncParams() {
+        let params = []
+        // if(this.token.type !== TokenType.LeftParenthesis) {
+        //     return null
+        // }
+        // this.next()
+        while (this.token.type !== TokenType.RightParenthesis) {
+            if (this.token.type == TokenType.LeftParenthesis) {
+                this.next()
+            } else if (this.token.type == TokenType.TypeString) {
+                params.push(this.token)
+                this.next()
+            } else if (this.token.type == TokenType.Comma) {
+                this.next()
+            } else {
+                throw new Error('function Parameter parse error')
+            }
+        }
+        return new FunctionParameter(params)
+    }
+
+    parseProgram() {
         const m: Statement[] = []
         let n: Statement | null | void = null
         while (true) {
@@ -128,14 +121,16 @@ export class AstParser {
                 m.push(n)
                 continue
             }
-            if (n == null) {
-                break
-            }
-            if (!this.token) {
+            // if (n) {
+            //     m.push(n)
+            //     continue
+            // }
+            // n = this.parseFuncCall()
+            if (n === null) {
                 break
             }
         }
-        return m
+        return new Program(m)
     }
 
 

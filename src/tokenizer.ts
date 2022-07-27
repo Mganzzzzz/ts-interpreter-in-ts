@@ -14,7 +14,7 @@ export class Tokenizer {
         return this.source[this.i]
     }
 
-    parse():Token[] {
+    parse(): Token[] {
         const m: Token[] = []
         let n: Token | null = null
         while (true) {
@@ -104,7 +104,7 @@ export class Tokenizer {
     }
 }
 
-enum TokenType {
+export enum TokenType {
     TypeString = 'TypeString',
     LeftBracket = 'LeftBracket', // [
     RightBracket = 'RightBracket', // ]
@@ -117,14 +117,19 @@ enum TokenType {
     DoubleSlashes = 'DoubleSlashes', // //
     SingleSlash = 'SingleSlash', // /
     Semicolon = 'Semicolon',  // :
+    Comma = 'Comma',  // ,
 }
 
 export class Token {
-    type: TokenType
-    raw: string
+    public type: TokenType
+    public raw: string
 
     constructor(raw, type: TokenType) {
         this.raw = raw
         this.type = type
+    }
+
+    get [Symbol.toStringTag]() {
+        return `${this.type}-${this.raw}`;
     }
 }

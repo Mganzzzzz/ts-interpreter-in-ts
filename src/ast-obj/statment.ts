@@ -1,11 +1,10 @@
-import {Tokenizer} from "../tokenizer";
-
+import {Token, Tokenizer} from "../tokenizer";
 
 
 export class Statement {
-    token: Tokenizer
+    token: Token
 
-    constructor(token?: Tokenizer) {
+    constructor(token: Token = null) {
         this.token = token
     }
 }
