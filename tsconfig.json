@@ -20,6 +20,7 @@
   },
     "include": [
     "src/**/*",
+    "**/*.txt",
     "node_modules/cos-nodejs-sdk-v5/index.d.ts"
   ],
     "exclude": [
