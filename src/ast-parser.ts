@@ -9,6 +9,8 @@ import {Program} from "./ast-obj/program";
 export class AstParser {
     tokenList: Token[]
     index: number = 0
+    program: Program
+    statment: Statement[]
 
     constructor(tokenList: Token[]) {
         this.tokenList = tokenList
@@ -57,7 +59,12 @@ export class AstParser {
     parseFuncBody(): FunctionBody | null {
         const sm: Statement[] = []
         while (this.token.type !== TokenType.RightBrace) {
-            sm.push(new Statement(this.token))
+            let n = this.parseFuncCall()
+            if (n) {
+                console.log('debug n', n)
+                sm.push(n)
+                continue
+            }
             this.next()
         }
         this.next()
@@ -83,7 +90,8 @@ export class AstParser {
         } else {
             throw new Error('function should call with ()')
         }
-        return new FunctionCall(funcName, params)
+        const ref = this.findFunctionDecl()
+        return new FunctionCall(funcName, ref, params)
     }
 
     parseFuncParams() {
@@ -100,6 +108,9 @@ export class AstParser {
                 this.next()
             } else if (this.token.type == TokenType.Comma) {
                 this.next()
+            } else if (this.token.type == TokenType.SingleQuotation || this.token.type == TokenType.DoubleQuotation) {
+                const s = this.parseStringLiteral()
+                params.push(s)
             } else {
                 throw new Error('function Parameter parse error')
             }
@@ -107,8 +118,42 @@ export class AstParser {
         return new FunctionParameter(params)
     }
 
-    parseProgram() {
+    parseStringLiteral() {
+        let s = ''
+        if (this.token.type == TokenType.SingleQuotation) {
+            this.next()
+            while (this.token.type !== TokenType.SingleQuotation) {
+                s += this.token.raw
+                this.next()
+            }
+            this.next()
+            return new Token(s, TokenType.TypeString)
+
+        } else if (this.token.type == TokenType.DoubleQuotation) {
+            this.next()
+            while (this.token.type !== TokenType.DoubleQuotation) {
+                s += this.token.raw
+                this.next()
+            }
+            this.next()
+            return new Token(s, TokenType.TypeString)
+        }
+        return null
+    }
+
+    findFunctionDecl(): FunctionDecl | null {
+        let ret = null
+        this.statment.forEach(n => {
+            if (n instanceof FunctionDecl) {
+                ret = n
+            }
+        })
+        return ret
+    }
+
+    parseProgram(): Program | null {
         const m: Statement[] = []
+        this.statment  = m
         let n: Statement | null | void = null
         while (true) {
             n = this.parseFuncDecl()
@@ -121,16 +166,14 @@ export class AstParser {
                 m.push(n)
                 continue
             }
-            // if (n) {
-            //     m.push(n)
-            //     continue
-            // }
-            // n = this.parseFuncCall()
+
             if (n === null) {
                 break
             }
         }
-        return new Program(m)
+        const prog = new Program(m)
+        this.program = prog
+        return prog
     }
 
 

@@ -4,6 +4,7 @@ import {Statement} from "./ast-obj/statment";
 
 import {Tokenizer} from "./tokenizer";
 import {AstParser} from "./ast-parser";
+import {ProgramExec} from "./program-exec";
 
 function main() {
     const s = fs.readFileSync(path.join(path.dirname(__filename), './source1.txt'), {encoding: "utf-8"})
@@ -11,7 +12,9 @@ function main() {
     let tokens = tokenizer.parse()
     const ast = new AstParser(tokens)
     const astTree = ast.parseProgram()
-    console.log(astTree);
+    const programExec = new ProgramExec(astTree)
+    programExec.dfs()
+
 }
 
 main()

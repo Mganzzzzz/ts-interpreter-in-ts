@@ -6,6 +6,9 @@ export class FunctionBody extends Statement {
     constructor(statement: Statement[]) {
         super();
         this.statement = statement
-
     }
+    toString() {
+        return this.statement
+    }
+
 }
