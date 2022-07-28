@@ -1,4 +1,5 @@
 import * as util from "util";
+import * as path from "path";
 
 export class CompilerObject {
     private prototype: CompilerObject;
@@ -18,8 +19,11 @@ export class CompilerObject {
     }
 
     str(): string {
-        const s = this.toString()
-        const inspect = s || this.prototype.constructor.name
-        return ` < ${this.objName} ${inspect}> `
+        const filename = path.basename(__filename)
+        const mod = filename.split('.')[0]
+        const prototype = Object.getPrototypeOf(this)
+        const superName = prototype.__proto__.constructor.name
+        const name = this.constructor.name
+        return `<${mod}.${name} ${superName}>`
     }
 }
