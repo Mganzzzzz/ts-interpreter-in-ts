@@ -1,5 +1,4 @@
 function sayHello() {
     println("hello ts compiler")
-    println("hello ts compiler111")
 }
 sayHello()

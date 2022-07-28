@@ -7,8 +7,8 @@ export class FunctionBody extends Statement {
         super();
         this.statement = statement
     }
-    toString() {
-        return this.statement
-    }
 
+    toString(): string {
+        return `${this.statement}`
+    }
 }

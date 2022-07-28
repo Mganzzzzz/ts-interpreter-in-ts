@@ -11,4 +11,7 @@ export class FunctionDecl extends Statement {
         this.funcBody = statement
         this.funcName = funcName
     }
+    toString(): string {
+        return ` < ${this.objName} ${this.funcName.raw} > `
+    }
 }

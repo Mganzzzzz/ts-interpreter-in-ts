@@ -6,17 +6,18 @@ import {FunctionDecl} from "./function-decl";
 
 export class FunctionCall extends Statement {
     funcName: Token
-    FunctionParameter: FunctionParameter
+    functionParameter: FunctionParameter
     funcRef: FunctionDecl
 
     constructor(funcName: Token, funcRef: FunctionDecl, funcParams?: FunctionParameter,) {
         super();
         this.funcName = funcName
         this.funcRef = funcRef
-        this.FunctionParameter = funcParams
+        this.functionParameter = funcParams
     }
 
-    get [Symbol.toStringTag]() {
-        return `${this.funcName}`;
+
+    toString(): string {
+        return ` < ${this.objName} ${this.funcName.raw} ${this.functionParameter} > `
     }
 }

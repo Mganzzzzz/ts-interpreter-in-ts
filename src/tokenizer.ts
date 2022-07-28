@@ -1,12 +1,14 @@
 import {Statement} from "./ast-obj/statment";
 import {isAlpha, isNumber, isSpace} from "./string-utils";
+import {CompilerObject} from "./build-in/compiler-object";
 
-export class Tokenizer {
+export class Tokenizer extends CompilerObject {
     index: number = 0
     source: string
     i: number = 0
 
     constructor(source: string) {
+        super();
         this.source = source;
     }
 
@@ -27,11 +29,12 @@ export class Tokenizer {
                 continue
             }
             if (isSpace(this.letter)) {
+                m.push(new Token(' ', TokenType.Space))
                 this.nextLetter()
                 continue
             }
 
-            c = this.parseQuotation()
+            c = this.parseStringLiteral()
             if (c) {
                 m.push(c)
                 continue
@@ -64,19 +67,31 @@ export class Tokenizer {
             this.nextLetter()
             c = this.letter
         }
-        const ret = new Token(s, TokenType.TypeString)
+        const ret = new Token(s, TokenType.Identifier)
         return ret
     }
 
-
-    private parseQuotation() {
+    private parseStringLiteral() {
         let s = this.letter
+        let ret = ''
         if (s === "'") {
             this.nextLetter()
-            return new Token(s, TokenType.SingleQuotation)
+            while (this.letter !== "'") {
+                ret += this.letter
+                this.nextLetter()
+            }
+            this.nextLetter()
+            return new Token(ret, TokenType.StringLiteral)
+            // this.nextLetter()
+            // return new Token(s, TokenType.SingleQuotation)
         } else if (s === '"') {
             this.nextLetter()
-            return new Token(s, TokenType.DoubleQuotation)
+            while (this.letter !== '"') {
+                ret += this.letter
+                this.nextLetter()
+            }
+            this.nextLetter()
+            return new Token(ret, TokenType.StringLiteral)
         }
         return null
     }
@@ -105,7 +120,8 @@ export class Tokenizer {
 }
 
 export enum TokenType {
-    TypeString = 'TypeString',
+    Identifier = 'Identifier',
+    KeyWord = 'KeyWord', //
     LeftBracket = 'LeftBracket', // [
     RightBracket = 'RightBracket', // ]
     LeftParenthesis = 'LeftParenthesis', // (
@@ -118,18 +134,21 @@ export enum TokenType {
     SingleSlash = 'SingleSlash', // /
     Semicolon = 'Semicolon',  // :
     Comma = 'Comma',  // ,
+    Space = 'Space',  // ,
+    StringLiteral = 'StringLiteral', // string
 }
 
-export class Token {
+export class Token extends CompilerObject {
     public type: TokenType
     public raw: string
 
     constructor(raw, type: TokenType) {
+        super();
         this.raw = raw
         this.type = type
     }
 
-    get [Symbol.toStringTag]() {
-        return `${this.type}-${this.raw}`;
+    toString(): string {
+        return ` ${this.raw} ${this.type}`
     }
 }

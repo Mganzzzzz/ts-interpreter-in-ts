@@ -8,7 +8,9 @@ export class FunctionParameter extends Statement {
         super();
         this.parameter = parameter
     }
-    get [Symbol.toStringTag]() {
-        return this.parameter
+
+    toString(): string {
+
+        return `[${this.parameter.toString()}]`
     }
 }

@@ -7,4 +7,9 @@ export class Program extends Statement {
         super();
         this.statement = statement
     }
+
+
+    toString(): string {
+        return `${this.statement}`
+    }
 }

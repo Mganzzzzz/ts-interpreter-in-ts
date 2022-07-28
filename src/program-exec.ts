@@ -16,7 +16,11 @@ export class ProgramExec {
 
     }
 
-    dfs() {
+    exec() {
+        this.dfs()
+    }
+
+    private dfs() {
         for (const statement of this.program.statement) {
             if (statement instanceof FunctionDecl) {
                 //
@@ -39,7 +43,7 @@ export class ProgramExec {
 
     execFuncCall(statement: FunctionCall) {
 
-        const parameter = statement.FunctionParameter.parameter
+        const parameter = statement.functionParameter.parameter
         const args = parameter.map(n => n.raw)
         if (this.isBuildIn(statement)) {
             return println.call(null, ...args)

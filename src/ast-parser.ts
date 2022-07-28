@@ -40,9 +40,10 @@ export class AstParser {
             return null
         }
 
-        if (token.type === TokenType.TypeString && token.raw === 'function') {
+        if (token.type === TokenType.Identifier && token.raw === 'function') {
             this.next()
             funcName = this.token
+            this.next()
             this.next()
             funcBody = this.parseFuncBody()
         } else {
@@ -61,7 +62,6 @@ export class AstParser {
         while (this.token.type !== TokenType.RightBrace) {
             let n = this.parseFuncCall()
             if (n) {
-                console.log('debug n', n)
                 sm.push(n)
                 continue
             }
@@ -78,7 +78,7 @@ export class AstParser {
      * params: string  ","
      */
     parseFuncCall(): FunctionCall {
-        if (this.token.type !== TokenType.TypeString) {
+        if (this.token.type !== TokenType.Identifier) {
             return null
         }
         let funcName = this.token
@@ -91,7 +91,8 @@ export class AstParser {
             throw new Error('function should call with ()')
         }
         const ref = this.findFunctionDecl()
-        return new FunctionCall(funcName, ref, params)
+        const r = new FunctionCall(funcName, ref, params)
+        return r
     }
 
     parseFuncParams() {
@@ -103,7 +104,7 @@ export class AstParser {
         while (this.token.type !== TokenType.RightParenthesis) {
             if (this.token.type == TokenType.LeftParenthesis) {
                 this.next()
-            } else if (this.token.type == TokenType.TypeString) {
+            } else if (this.token.type == TokenType.StringLiteral) {
                 params.push(this.token)
                 this.next()
             } else if (this.token.type == TokenType.Comma) {
@@ -127,7 +128,7 @@ export class AstParser {
                 this.next()
             }
             this.next()
-            return new Token(s, TokenType.TypeString)
+            return new Token(s, TokenType.Identifier)
 
         } else if (this.token.type == TokenType.DoubleQuotation) {
             this.next()
@@ -136,7 +137,7 @@ export class AstParser {
                 this.next()
             }
             this.next()
-            return new Token(s, TokenType.TypeString)
+            return new Token(s, TokenType.Identifier)
         }
         return null
     }
@@ -151,11 +152,28 @@ export class AstParser {
         return ret
     }
 
+    resolveFuncCallRef() {
+        let ret = null
+        this.statment.forEach(n => {
+            if (n instanceof FunctionCall) {
+                if (n.funcRef === null) {
+                    n.funcRef = this.findFunctionDecl()
+                }
+            }
+        })
+        return ret
+
+    }
+
     parseProgram(): Program | null {
         const m: Statement[] = []
-        this.statment  = m
+        this.statment = m
         let n: Statement | null | void = null
         while (true) {
+            if (this.token.type === TokenType.Space) {
+                this.next()
+                continue
+            }
             n = this.parseFuncDecl()
             if (n) {
                 m.push(n)
@@ -172,7 +190,9 @@ export class AstParser {
             }
         }
         const prog = new Program(m)
+        this.resolveFuncCallRef()
         this.program = prog
+
         return prog
     }
 
