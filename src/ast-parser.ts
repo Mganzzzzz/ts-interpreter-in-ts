@@ -1,6 +1,7 @@
 import {Statement} from "./ast-obj/statment";
 import {FunctionDecl} from "./ast-obj/function-decl";
-import {Token, TokenType} from "./tokenizer";
+import {Token} from "./build-in/token";
+import {TokenType} from "./build-in/type";
 import {FunctionBody} from "./ast-obj/function-body";
 import {FunctionCall} from "./ast-obj/function-call";
 import {FunctionParameter} from "./ast-obj/function-parameter";
@@ -60,9 +61,9 @@ export class AstParser {
     parseFuncBody(): FunctionBody | null {
         const sm: Statement[] = []
         while (this.token.type !== TokenType.RightBrace) {
-            let n = this.parseFuncCall()
-            if (n) {
-                sm.push(n)
+            let functionCall = this.parseFuncCall()
+            if (functionCall) {
+                sm.push(functionCall)
                 continue
             }
             this.next()

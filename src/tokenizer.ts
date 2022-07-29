@@ -1,6 +1,9 @@
 import {Statement} from "./ast-obj/statment";
+import {Token} from "./build-in/token";
+
 import {isAlpha, isNumber, isSpace} from "./string-utils";
 import {CompilerObject} from "./build-in/compiler-object";
+import {TokenType} from "./build-in/type";
 
 export class Tokenizer extends CompilerObject {
     index: number = 0
@@ -119,36 +122,3 @@ export class Tokenizer extends CompilerObject {
     }
 }
 
-export enum TokenType {
-    Identifier = 'Identifier',
-    KeyWord = 'KeyWord', //
-    LeftBracket = 'LeftBracket', // [
-    RightBracket = 'RightBracket', // ]
-    LeftParenthesis = 'LeftParenthesis', // (
-    RightParenthesis = 'RightParenthesis', // )
-    LeftBraces = 'LeftBraces', // {
-    RightBrace = 'RightBrace', // }
-    SingleQuotation = 'SingleQuotation', // '
-    DoubleQuotation = 'DoubleQuotation', // "
-    DoubleSlashes = 'DoubleSlashes', // //
-    SingleSlash = 'SingleSlash', // /
-    Semicolon = 'Semicolon',  // :
-    Comma = 'Comma',  // ,
-    Space = 'Space',  // ,
-    StringLiteral = 'StringLiteral', // string
-}
-
-export class Token extends CompilerObject {
-    public type: TokenType
-    public raw: string
-
-    constructor(raw, type: TokenType) {
-        super();
-        this.raw = raw
-        this.type = type
-    }
-
-    toString(): string {
-        return ` ${this.raw} ${this.type}`
-    }
-}

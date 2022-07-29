@@ -1,6 +1,5 @@
 import {Statement} from "./statment";
-import {Token} from "../tokenizer";
-import {FunctionBody} from "./function-body";
+import {Token} from "../build-in/token";
 import {FunctionParameter} from "./function-parameter";
 import {FunctionDecl} from "./function-decl";
 

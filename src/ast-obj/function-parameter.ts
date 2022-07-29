@@ -1,5 +1,5 @@
 import {Statement} from "./statment";
-import {Token} from "../tokenizer";
+import {Token} from "../build-in/token";
 
 export class FunctionParameter extends Statement {
     parameter: Token[]

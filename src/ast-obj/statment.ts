@@ -1,5 +1,5 @@
-import {Token, Tokenizer} from "../tokenizer";
 import {CompilerObject} from "../build-in/compiler-object";
+import {Token} from "../build-in/token";
 
 
 export class Statement extends CompilerObject {
